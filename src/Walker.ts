@@ -101,7 +101,13 @@ export class Walker {
       if (!await fs.pathExists(nodeModulesPath)) return;
 
       for (const subModuleName of await fs.readdir(nodeModulesPath)) {
-        await this.pruneModule(path.resolve(nodeModulesPath, subModuleName));
+        if (subModuleName.startsWith('@')) {
+          for (const subScopedModuleName of await fs.readdir(path.resolve(nodeModulesPath, subModuleName))) {
+            await this.pruneModule(path.resolve(nodeModulesPath, subModuleName, subScopedModuleName));
+          }
+        } else {
+          await this.pruneModule(path.resolve(nodeModulesPath, subModuleName));
+        }
       }
     } else {
       await fs.remove(modulePath);
