@@ -43,7 +43,11 @@ export class Walker {
     }
     // If we can't find it the install is probably buggered
     if (!discoveredPath && !allowMissing) {
-      throw new Error(`Failed to locate module "${moduleName}" from "${modulePath}"`);
+      throw new Error(
+        `Failed to locate module "${moduleName}" from "${modulePath}"
+
+        This normally means that either you have deleted this package already somehow (check your ignore settings if using electron-packager).  Or your module installation failed.`
+      );
     }
     // If we can find it let's do the same thing for that module
     if (discoveredPath) {
