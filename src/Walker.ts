@@ -38,6 +38,9 @@ export class Walker {
       if (await fs.pathExists(lastRelative)) {
         discoveredPath = lastRelative;
       } else {
+        if (path.basename(path.dirname(testPath)) !== 'node_modules') {
+          testPath = path.dirname(testPath);
+        }
         testPath = path.dirname(path.dirname(testPath));
       }
     }
