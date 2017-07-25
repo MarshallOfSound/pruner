@@ -28,7 +28,7 @@ export class Walker {
     return null;
   }
 
-  private async loadProductionDependenciesForModuleInModule(moduleName: string, modulePath: string) {
+  private async loadProductionDependenciesForModuleInModule(moduleName: string, modulePath: string, allowMissing = false) {
     let testPath = modulePath;
     let discoveredPath: string | null = null;
     let lastRelative: string | null = null;
@@ -42,14 +42,16 @@ export class Walker {
       }
     }
     // If we can't find it the install is probably buggered
-    if (!discoveredPath) {
+    if (!discoveredPath && !allowMissing) {
       throw new Error(`Failed to locate module "${moduleName}" from "${modulePath}"`);
     }
     // If we can find it let's do the same thing for that module
-    await this.loadProductionDependenciesForModule(discoveredPath);
+    if (discoveredPath) {
+      await this.loadProductionDependenciesForModule(discoveredPath, allowMissing);
+    }
   }
 
-  private async loadProductionDependenciesForModule(modulePath: string) {
+  private async loadProductionDependenciesForModule(modulePath: string, allowMissing = false) {
     // We have already traversed this module
     if (this.prodPaths.has(modulePath)) return;
 
@@ -64,7 +66,8 @@ export class Walker {
     for (const moduleName in pJ.dependencies) {
       await this.loadProductionDependenciesForModuleInModule(
         moduleName,
-        modulePath
+        modulePath,
+        allowMissing
       );
     }
 
@@ -73,7 +76,8 @@ export class Walker {
     for (const moduleName in pJ.optionalDependencies) {
       await this.loadProductionDependenciesForModuleInModule(
         moduleName,
-        modulePath
+        modulePath,
+        true
       );
     }
   }
