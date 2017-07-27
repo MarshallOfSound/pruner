@@ -1,6 +1,6 @@
 {
   "name": "pruner",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Prunes development dependencies from your package",
   "main": "lib/index.js",
   "scripts": {
