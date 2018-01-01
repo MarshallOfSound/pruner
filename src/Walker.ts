@@ -118,4 +118,24 @@ export class Walker {
     await this.loadProductionDependencies();
     await this.pruneModule(this.rootModule);
   }
+
+  private getNearestModuleDirectory(tPath: string) {
+    while (!fs.statSync(tPath).isDirectory() || !fs.existsSync(path.resolve(tPath, 'package.json'))) {
+      tPath = path.dirname(tPath);
+    }
+    return tPath;
+  }
+
+  async getFsCopyIgnoreFunction() {
+    await this.loadProductionDependencies();
+    const prodPaths = this.prodPaths;
+    const nmPath = path.resolve(this.rootModule, 'node_modules');
+    return (tPath: string) => {
+      const dirPath = this.getNearestModuleDirectory(tPath);
+      if (tPath.indexOf(nmPath) === 0) {
+        return !prodPaths.has(dirPath);
+      }
+      return false;
+    };
+  }
 }
